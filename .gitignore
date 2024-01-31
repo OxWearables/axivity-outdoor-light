@@ -122,3 +122,6 @@ doc/build/html/index.html
 doc/tmp.sv
 env/
 doc/source/savefig/
+
+# output files
+outputs/

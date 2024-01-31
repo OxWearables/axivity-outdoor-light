@@ -18,7 +18,7 @@ The following instructions make use of Anaconda to meet the minimum requirements
     $ conda activate axlux
     ```
     You should now see `(axlux)` written in front of your prompt.
-1. Install `axlux`:
+1. Install the `axivity-outdoor-light` package:
     - Method 1 (SSH):
     ```console
     $ pip install 'axivity-outdoor-light @ git+ssh://git@github.com/OxWearables/axivity-outdoor-light'
