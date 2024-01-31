@@ -1,37 +1,119 @@
-# Sample PyPI package + GitHub Actions + Versioneer
+# Axivity Outdoor Light Exposure Analysis
 
-This template aims to automate the tedious and error-prone steps of tagging/versioning, building and publishing new package versions. This is achieved by syncing git tags and versions with Versioneer, and automating the build and release with GitHub Actions, so that publishing a new version is as painless as:
+## Install
 
-```console
-$ git tag vX.Y.Z && git push --tags
+*Minimum requirements*: Python>=3.8, Java 8 (1.8)
+
+The following instructions make use of Anaconda to meet the minimum requirements:
+
+1. Download & install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (light-weight version of Anaconda).
+1. (Windows) Once installed, launch the **Anaconda Prompt**.
+1. Create a virtual environment (here named `axlux`):
+    ```console
+    $ conda create -n axlux python=3.9 openjdk pip
+    ```
+    This creates a virtual environment called `axlux` with Python version 3.9, OpenJDK, and Pip.
+1. Activate the environment:
+    ```console
+    $ conda activate axlux
+    ```
+    You should now see `(axlux)` written in front of your prompt.
+1. Install `axlux`:
+    - Method 1 (SSH):
+    ```console
+    $ pip install 'axivity-outdoor-light @ git+ssh://git@github.com/OxWearables/axivity-outdoor-light'
+    ```
+    - Method 2 (HTTPS):
+    ```console
+    $ pip install 'axivity-outdoor-light @ git+https://github.com/OxWearables/axivity-outdoor-light'
+    ```
+
+You are all set! The next time that you want to use `axlux`, open the Anaconda Prompt and activate the environment (step 4). If you see `(axlux)` in front of your prompt, you are ready to go!
+
+## Usage
+
+```bash
+# Process an AX3 file
+$ axlux sample.cwa
+
+# Or an ActiGraph file
+$ axlux sample.gt3x
+
+# Or a GENEActiv file
+$ axlux sample.bin
+
+# Or a CSV file (see accepted data format below)
+$ axlux sample.csv
 ```
 
-The following guide assumes familiarity with `setuptools` and PyPI. For an introduction to Python packaging, see the references at the bottom.
+Output:
+```console
+Summary
+-------
+{
+    "Filename": "sample.cwa",
+    "Filesize(MB)": 69.4,
+    "Device": "Axivity",
+    "DeviceID": 13110,
+    "ReadErrors": 0,
+    "SampleRate": 100.0,
+    "ReadOK": 1,
+    "StartTime": "2014-05-07 13:29:50",
+    "EndTime": "2014-05-13 09:50:33",
+    "TotalOutdoorLight(mins)": 492.0,
+    "OutdoorLightDayAvg(mins)": 70.28571428571429,
+    "OutdoorLightDayMed(mins)": 51.0,
+    "OutdoorLightDayMin(mins)": 12.0,
+    "OutdoorLightDayMax(mins)": 165.0,
+    ...
+}
 
-## How to use this template
+Estimated Daily Outdoor Light
+-----------------------------
+            OutdoorLight(mins)  OutdoorLightAdjusted(mins)
+time
+2014-05-07            51.0               63.166667
+2014-05-08            39.0               39.000000
+2014-05-09            68.0               68.000000
+2014-05-10           120.0              120.000000
+...
 
-1. Click on the *Use this template* button to get a copy of this repository.
-1. Rename *src/sample_package* folder to your package name &mdash; *src/* is where your package must reside.
-1. Go through each of the following files and rename all instances of *sample-package* or *sample_package* to your package name. Also update the package information such as author names, URLs, etc.
-    1. setup.py
-    1. pyproject.toml
-    1. \_\_init\_\_.py
-1. Install `versioneer` and `tomli`, and run `versioneer`:
+Output: outputs/sample/
+```
 
-    ```console
-    $ pip install tomli
-    $ pip install versioneer
-    $ versioneer install
-    ```
-    Then *commit* the changes produced by `versioneer`. See [here](https://github.com/python-versioneer/python-versioneer/blob/master/INSTALL.md) to learn more.
-1. Setup your PyPI credentials. See the section *Saving credentials on Github* of [this guide](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/). You should use the variable names `TEST_PYPI_API_TOKEN` and `PYPI_API_TOKEN` for the TestPyPI and PyPI tokens, respectively. See *.github/workflows/release.yaml*.
+### Troubleshooting 
+Some systems may face issues with Java when running the script. If this is your case, try fixing OpenJDK to version 8:
+```console
+$ conda install -n axlux openjdk=8
+```
 
-You are all set! It should now be possible to run `git tag vX.Y.Z && git push --tags` to automatically version, build and publish a new release to PyPI.
+### Output files
+By default, output files will be stored in a folder named after the input file, `outputs/{filename}/`, created in the current working directory. You can change the output path with the `-o` flag:
 
-Finally, it is a good idea to [configure tag protection rules](https://docs.github.com/en/enterprise-server@3.8/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/configuring-tag-protection-rules) in your repository.
+```console
+$ axlux sample.cwa -o /path/to/some/folder/
+```
 
-## References
-- Python packaging guide: https://packaging.python.org/en/latest/tutorials/packaging-projects/
-    - ...and how things are changing: https://snarky.ca/what-the-heck-is-pyproject-toml/ &mdash; in particular, note that while *pyproject.toml* seems to be the future, currently Versioneer still depends on *setup.py*.
-- Versioneer: https://github.com/python-versioneer/python-versioneer
-- GitHub Actions: https://docs.github.com/en/actions
+The following output files are created:
+
+- *Info.json* Summary info, as shown above.
+- *Minutes.csv* Raw time-series of outdoor light minute-by-minute estimates.
+- *Hourly.csv* Hourly outdoor light time.
+- *Daily.csv* Daily outdoor light time. 
+- *HourlyAdjusted.csv* Like Hourly but accounting for missing data (see section below).
+- *DailyAdjusted.csv* Like Daily but accounting for missing data (see section below).
+
+### Crude vs. Adjusted Estimates
+Adjusted estimates are provided that account for missing data.
+Missing values in the time-series are imputed with the mean of the same timepoint of other available days.
+For adjusted totals and daily statistics, 24h multiples are needed and will be imputed if necessary.
+Estimates will be NaN where data is still missing after imputation.
+
+### Processing CSV files
+TODO
+
+## Licence
+TODO
+
+## Acknowledgements
+We would like to thank all our code contributors, manuscript co-authors, and research participants for their help in making this work possible.
