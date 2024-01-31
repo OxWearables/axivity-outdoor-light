@@ -49,7 +49,16 @@ def main():
         # include_package_data=True,
 
         # Dependencies
-        install_requires=[],
+        install_requires=[
+            "actipy>=3.0.5",
+            "numpy==1.25.*",
+            "pandas==2.0.*",
+            "scipy==1.11.*",
+            "statsmodels==0.14.*",
+            "scikit-learn==1.3.*",
+            "tqdm==4.64.*",
+            "matplotlib==3.8.*",
+        ],
 
         # Optional packages. Can be installed with:
         # `$ pip install axivity-outdoor-light[dev]` or
