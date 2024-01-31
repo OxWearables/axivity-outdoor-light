@@ -64,7 +64,7 @@ def main():
     #         continue
     #     sunlit.loc[g[~na].index] = predict_outdoor(g.loc[~na, 'light'])
 
-    print("Estimating sunlight...")
+    print("Estimating outdoor light...")
     na = data.isna().any(axis=1)
     sunlit.loc[~na] = predict_outdoor(data.loc[~na, 'light'])
 
@@ -78,30 +78,30 @@ def main():
 
     sunlit = sunlit.rolling(5, min_periods=1).apply(mode, raw=True)
 
-    fig = plot(sunlit, enmo=data['enmo'], label='Sunlight', title=basename)
+    fig = plot(sunlit, enmo=data['enmo'], label='Outdoor Light', title=basename)
     fig.savefig(f"{outdir}/{basename}-Plot.png")
 
     # Moderate to Vigorous Physical Activity
     mvpa = (data['enmo'] >= 100).astype('float')  # 100 millig
     mvpa[na] = np.nan
 
-    # Moderate to Vigorous Physical Activity in Sunlight
+    # Moderate to Vigorous Physical Activity and Outdoor Light
     sunlit_and_mvpa = (sunlit.astype('bool') & mvpa.astype('bool')).astype('float')
     sunlit_and_mvpa[na] = np.nan
 
     pd.concat([
-        sunlit.rename('Sunlight'),
+        sunlit.rename('Outdoor'),
         mvpa.rename('MVPA'),
-        sunlit_and_mvpa.rename('SunlightMVPA')
+        sunlit_and_mvpa.rename('OutdoorMVPA')
     ], axis=1).to_csv(f"{outdir}/{basename}-Minutes.csv")
 
     # Summary
     sunlit_summa = summarize(sunlit, adjust_estimates=False)
-    info['TotalSunlight(mins)'] = sunlit_summa['total']
-    info['SunlightDayAvg(mins)'] = sunlit_summa['daily_avg']
-    info['SunlightDayMed(mins)'] = sunlit_summa['daily_med']
-    info['SunlightDayMin(mins)'] = sunlit_summa['daily_min']
-    info['SunlightDayMax(mins)'] = sunlit_summa['daily_max']
+    info['TotalOutdoorLight(mins)'] = sunlit_summa['total']
+    info['OutdoorLightDayAvg(mins)'] = sunlit_summa['daily_avg']
+    info['OutdoorLightDayMed(mins)'] = sunlit_summa['daily_med']
+    info['OutdoorLightDayMin(mins)'] = sunlit_summa['daily_min']
+    info['OutdoorLightDayMax(mins)'] = sunlit_summa['daily_max']
 
     mvpa_summa = summarize(mvpa, adjust_estimates=False)
     info['TotalMVPA(mins)'] = mvpa_summa['total']
@@ -111,31 +111,31 @@ def main():
     info['MVPADayMax(mins)'] = mvpa_summa['daily_max']
 
     sunlit_and_mvpa_summa = summarize(sunlit_and_mvpa, adjust_estimates=False)
-    info['TotalSunlightMVPA(mins)'] = sunlit_and_mvpa_summa['total']
-    info['SunlightMVPADayAvg(mins)'] = sunlit_and_mvpa_summa['daily_avg']
-    info['SunlightMVPADayMed(mins)'] = sunlit_and_mvpa_summa['daily_med']
-    info['SunlightMVPADayMin(mins)'] = sunlit_and_mvpa_summa['daily_min']
-    info['SunlightMVPADayMax(mins)'] = sunlit_and_mvpa_summa['daily_max']
+    info['TotalOutdoorMVPA(mins)'] = sunlit_and_mvpa_summa['total']
+    info['OutdoorMVPADayAvg(mins)'] = sunlit_and_mvpa_summa['daily_avg']
+    info['OutdoorMVPADayMed(mins)'] = sunlit_and_mvpa_summa['daily_med']
+    info['OutdoorMVPADayMin(mins)'] = sunlit_and_mvpa_summa['daily_min']
+    info['OutdoorMVPADayMax(mins)'] = sunlit_and_mvpa_summa['daily_max']
 
     pd.concat([
-        sunlit_summa['daily'].rename('Sunlight(mins)'),
+        sunlit_summa['daily'].rename('OutdoorLight(mins)'),
         mvpa_summa['daily'].rename('MVPA(mins)'),
-        sunlit_and_mvpa_summa['daily'].rename('SunlightMVPA(mins)')
+        sunlit_and_mvpa_summa['daily'].rename('OutdoorMVPA(mins)')
     ], axis=1).to_csv(f"{outdir}/{basename}-Daily.csv")
 
     pd.concat([
-        sunlit_summa['hourly'].rename('Sunlight(mins)'),
+        sunlit_summa['hourly'].rename('OutdoorLight(mins)'),
         mvpa_summa['hourly'].rename('MVPA(mins)'),
-        sunlit_and_mvpa_summa['hourly'].rename('SunlightMVPA(mins)')
+        sunlit_and_mvpa_summa['hourly'].rename('OutdoorMVPA(mins)')
     ], axis=1).to_csv(f"{outdir}/{basename}-Hourly.csv")
 
     # Summary Adjusted
     sunlit_summa_adj = summarize(sunlit, adjust_estimates=True)
-    info['TotalSunlightAdjusted(mins)'] = sunlit_summa_adj['total']
-    info['SunlightDayAvgAdjusted(mins)'] = sunlit_summa_adj['daily_avg']
-    info['SunlightDayMedAdjusted(mins)'] = sunlit_summa_adj['daily_med']
-    info['SunlightDayMinAdjusted(mins)'] = sunlit_summa_adj['daily_min']
-    info['SunlightDayMaxAdjusted(mins)'] = sunlit_summa_adj['daily_max']
+    info['TotalOutdoorLightAdjusted(mins)'] = sunlit_summa_adj['total']
+    info['OutdoorLightDayAvgAdjusted(mins)'] = sunlit_summa_adj['daily_avg']
+    info['OutdoorLightDayMedAdjusted(mins)'] = sunlit_summa_adj['daily_med']
+    info['OutdoorLightDayMinAdjusted(mins)'] = sunlit_summa_adj['daily_min']
+    info['OutdoorLightDayMaxAdjusted(mins)'] = sunlit_summa_adj['daily_max']
 
     mvpa_summa_adj = summarize(mvpa, adjust_estimates=True)
     info['TotalMVPAAdjusted(mins)'] = mvpa_summa_adj['total']
@@ -145,22 +145,22 @@ def main():
     info['MVPADayMaxAdjusted(mins)'] = mvpa_summa_adj['daily_max']
 
     sunlit_and_mvpa_summa_adj = summarize(sunlit_and_mvpa, adjust_estimates=True)
-    info['TotalSunlightMVPAAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['total']
-    info['SunlightMVPADayAvgAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_avg']
-    info['SunlightMVPADayMedAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_med']
-    info['SunlightMVPADayMinAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_min']
-    info['SunlightMVPADayMaxAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_max']
+    info['TotalOutdoorMVPAAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['total']
+    info['OutdoorMVPADayAvgAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_avg']
+    info['OutdoorMVPADayMedAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_med']
+    info['OutdoorMVPADayMinAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_min']
+    info['OutdoorMVPADayMaxAdjusted(mins)'] = sunlit_and_mvpa_summa_adj['daily_max']
 
     pd.concat([
-        sunlit_summa_adj['daily'].rename('SunlightAdjusted(mins)'),
+        sunlit_summa_adj['daily'].rename('OutdoorLightAdjusted(mins)'),
         mvpa_summa_adj['daily'].rename('MVPAAdjusted(mins)'),
-        sunlit_and_mvpa_summa_adj['daily'].rename('SunlightMVPAAdjusted(mins)')
+        sunlit_and_mvpa_summa_adj['daily'].rename('OutdoorMVPAAdjusted(mins)')
     ], axis=1).to_csv(f"{outdir}/{basename}-DailyAdjusted.csv")
 
     pd.concat([
-        sunlit_summa_adj['hourly'].rename('SunlightAdjusted(mins)'),
+        sunlit_summa_adj['hourly'].rename('OutdoorLightAdjusted(mins)'),
         mvpa_summa_adj['hourly'].rename('MVPAAdjusted(mins)'),
-        sunlit_and_mvpa_summa_adj['hourly'].rename('SunlightMVPAAdjusted(mins)')
+        sunlit_and_mvpa_summa_adj['hourly'].rename('OutdoorMVPAAdjusted(mins)')
     ], axis=1).to_csv(f"{outdir}/{basename}-HourlyAdjusted.csv")
 
     # Save info
@@ -170,10 +170,10 @@ def main():
     # Print
     print("\nSummary\n-------")
     print(json.dumps(info, indent=4, cls=NpEncoder))
-    print("\nEstimated Daily Sunlight\n---------------------")
+    print("\nEstimated Daily OutdoorLight\n---------------------")
     print(pd.concat([
-        sunlit_summa['daily'].rename('Sunlight(mins)'),
-        sunlit_summa_adj['daily'].rename('SunlightAdjusted(mins)'),
+        sunlit_summa['daily'].rename('OutdoorLight(mins)'),
+        sunlit_summa_adj['daily'].rename('OutdoorLightAdjusted(mins)'),
     ], axis=1))
 
     print(f"Done! ({time.time() - before:.2f}s)")
