@@ -2,7 +2,7 @@
 
 ## Install
 
-*Minimum requirements*: Python>=3.8, Java 8 (1.8)
+*Minimum requirements*: Python 3.8 to 3.10, Java 8 (1.8)
 
 The following instructions make use of Anaconda to meet the minimum requirements:
 
