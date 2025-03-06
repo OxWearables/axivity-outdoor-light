@@ -22,6 +22,7 @@
   - Med: Median daily duration
   - Min: Minimum daily duration
   - Max: Maximum daily duration
+- *Units*: Minutes
 
 ## Movement Metrics
 **`ENMO(mg)`**  
@@ -39,7 +40,7 @@
   - Med: Median daily duration
   - Min: Minimum daily duration
   - Max: Maximum daily duration
-
+- *Units*: Minutes
 
 ## Simultaneous Sunlight + MVPA
 **`TotalSunlightMVPA(mins)`**  
@@ -53,6 +54,7 @@
   - Med: Median daily duration
   - Min: Minimum daily duration
   - Max: Maximum daily duration
+- *Units*: Minutes
 
 ## Notes
 1. All values are derived using a minute-level resolution.
